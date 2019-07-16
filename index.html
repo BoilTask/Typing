@@ -129,10 +129,11 @@
 		</style>
 	</head>
 	<body>
-		<div id="number-box"><span id="now-number">123456.45</span></div>
+		<div id="number-box"><span id="now-number">点击开始</span></div>
 		<div id="input-box"><span id="input-span"></span><span class="blinker"></span></div>
 		<p id="count-label">
-			正确<span id="Correct">0</span>个，错误<span id="Error">0</span>个，正确率<span id="Percent">0</span>%<br><span id="SecondText">已过<span id="Second">0</span>秒</span>
+			正确<span id="Correct">0</span>个，错误<span id="Error">0</span>个，正确率<span id="Percent">0.00</span>%<br><span id="SecondText">已过<span
+				 id="Second">0</span>秒</span>
 		</p>
 
 		<script type="text/javascript">
@@ -140,12 +141,29 @@
 			var numBox = document.getElementById("now-number");
 			var numberBox = document.getElementById("number-box");
 			var inputBox = document.getElementById("input-span");
-			var gameEnd = false
+			var gameEnd = true
 			var cntCorrect = 0;
 			var cntError = 0;
 
 			var second = 0;
-			updateNum();
+
+			numberBox.onclick = function() {
+				if (gameEnd) {
+					gameEnd = false
+					updateNum();
+					var interval = setInterval(function() {
+						second++;
+						if (second >= 120) {
+							gameEnd = true
+							document.getElementById("SecondText").textContent = "游戏结束！";
+							clearInterval(interval);
+							alert('游戏结束，可刷新重试！')
+						} else {
+							document.getElementById("Second").textContent = second;
+						}
+					}, 1000);
+				}
+			}
 
 			document.body.onkeydown = function(e) {
 				if (!gameEnd) {
@@ -196,7 +214,7 @@
 				document.getElementById("Correct").textContent = cntCorrect;
 				document.getElementById("Error").textContent = cntError;
 				if (cntCorrect + cntError == 0) {
-					document.getElementById("Percent").textContent = 0.00;
+					document.getElementById("Percent").textContent = "0.00";
 				} else {
 					document.getElementById("Percent").textContent = (cntCorrect / (cntCorrect + cntError) * 100).toFixed(2);
 				}
@@ -209,18 +227,6 @@
 				}, 100);
 
 			}
-
-			var interval = setInterval(function() {
-				second++;
-				if (second >= 120) {
-					gameEnd = true
-					document.getElementById("SecondText").textContent = "游戏结束！";
-					clearInterval(interval);
-					alert('游戏结束，可刷新重试！')
-				}else{
-					document.getElementById("Second").textContent = second;
-				}
-			}, 1000);
 		</script>
 	</body>
 </html>
