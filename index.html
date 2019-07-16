@@ -4,103 +4,191 @@
 		<meta charset="utf-8">
 		<title>练习</title>
 		<style>
-			#char-box {
+			#number-box {
 				width: 600px;
-				height: 600px;
+				height: 300px;
 				border: solid 1px #000000;
-				border-radius: 50%;
+				border-radius: 10px;
 
-				font-size: 350px;
+				font-size: 50px;
 				text-align: center;
-				line-height: 600px;
+				line-height: 300px;
 
 				margin: 0 auto;
+			}
+
+			#input-box {
+				width: 600px;
+				height: 50px;
+				border-bottom: solid 1px #000000;
+				margin: 10px auto;
+				padding: 5px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#input-span {
+				font-size: 32px;
+			}
+
+			#now-number::before {
+				content: "-";
+				color: gray;
+				margin-right: 20px;
+			}
+
+			#now-number::after {
+				content: "-";
+				color: gray;
+				margin-left: 20px;
 			}
 
 			#count-label {
 				font-size: 32px;
 				text-align: center;
-				font-weight:700;
+				font-weight: 700;
 			}
-			.success{
+
+			.success {
 				color: green;
 			}
-			.error{
+
+			.error {
 				color: red;
 				animation-name: shake;
 				animation-duration: 100ms;
 				animation-iteration-count: 3;
 			}
-			@keyframes shake{
-				0%{
-					transform:translate(0,0);
+
+			@keyframes shake {
+				0% {
+					transform: translate(0, 0);
 				}
-				50%{
-					transform:translate(-30px,0);
+
+				50% {
+					transform: translate(-30px, 0);
 				}
-				100%{
-					transform:translate(30px,0);
+
+				100% {
+					transform: translate(30px, 0);
 				}
 			}
-			
-			.nextWord{
+
+			.nextNumber {
 				animation: zoomIn 300ms;
 			}
-			
-			@keyframes zoomIn{
-				0%{
-					transform: scale(0,0);
+
+			@keyframes zoomIn {
+				0% {
+					transform: scale(0, 0);
 				}
-				100%{
-					transform: scale(1,1);
+
+				100% {
+					transform: scale(1, 1);
+				}
+			}
+
+			.blinker {
+				-webkit-animation-name: blinker;
+				animation-name: blinker;
+				-webkit-animation-iteration-count: infinite;
+				animation-iteration-count: infinite;
+				-webkit-animation-timing-function: cubic-bezier(1, 0, 0, 1);
+				animation-timing-function: cubic-bezier(1, 0, 0, 1);
+				-webkit-animation-duration: 1s;
+				animation-duration: 1s;
+				display: inline-block;
+				width: 3px;
+				height: 50px;
+				margin-left: 10px;
+				border-radius: 3px;
+				box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+				background: #000000;
+			}
+
+			@-webkit-keyframes blinker {
+				from {
+					opacity: 1;
+				}
+
+				to {
+					opacity: 0;
+				}
+			}
+
+			@keyframes blinker {
+				from {
+					opacity: 1;
+				}
+
+				to {
+					opacity: 0;
 				}
 			}
 		</style>
 	</head>
 	<body>
-		<div id="char-box">W</div>
+		<div id="number-box"><span id="now-number">123456.45</span></div>
+		<div id="input-box"><span id="input-span"></span><span class="blinker"></span></div>
 		<p id="count-label">
 			正确<span id="Correct">0</span>个，错误<span id="Error">0</span>个，正确率<span id="Percent">0</span>%<br>已过<span id="Second">0</span>秒
 		</p>
+
 		<script type="text/javascript">
 			var c;
-			var charBox = document.getElementById("char-box");
-
+			var numBox = document.getElementById("now-number");
+			var numberBox=document.getElementById("number-box");
+			var inputBox = document.getElementById("input-span");
+			
 			var cntCorrect = 0;
 			var cntError = 0;
 
 			var second = 0;
-
-			updateChar();
+			updateNum();
 
 			document.body.onkeydown = function(e) {
-
-				if (c == e.key.toUpperCase()) {
-					cntCorrect++;
-
-					charBox.classList.add("success");
+				var inputNumber=e.key
+				if(!isNaN(inputNumber)||inputNumber=='.'){
+					inputBox.innerHTML = inputBox.innerText+inputNumber;
+				}else if(e.keyCode==13){
+					if(numBox.innerHTML==inputBox.innerHTML){
+						cntCorrect++;
+						numberBox.classList.add("success");
+						setTimeout(function() {
+							numberBox.classList.remove("success");
+						}, 300);
+					}else{
+						cntError++;
+						numberBox.classList.add("error");
+						setTimeout(function() {
+							numberBox.classList.remove("error");
+						}, 300);
+					}
+					inputBox.innerHTML = ''
 					setTimeout(function() {
-						charBox.classList.remove("success");
+						updateNum();
 					}, 300);
-				} else {
-					cntError++;
-					charBox.classList.add("error");
-					setTimeout(function() {
-						charBox.classList.remove("error");
-					}, 300);
+				}else if(e.keyCode==8){
+					inputBox.innerHTML = inputBox.innerHTML.substring(0, inputBox.innerHTML.length - 1);
 				}
-
-				setTimeout(function() {
-					updateChar();
-				}, 300);
 			}
-
-			function updateChar() {
-				var source = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
-				var num = Math.floor(Math.random() * 36);
-				c = source[num];
-				charBox.textContent = c;
-
+			function getRand(min,max){
+				return Math.floor(Math.random()*(max-min+1)+min);
+			}
+			function getNumber(l){
+				var number='';
+				number+=getRand(1,9)
+				for(var i=1;i<l;i++){
+					number+=getRand(0,9)
+				}
+				return number
+			}
+			
+			function updateNum() {
+				
+				numBox.textContent=getNumber(getRand(4,6))+'.'+getNumber(2)
+				
 				document.getElementById("Correct").textContent = cntCorrect;
 				document.getElementById("Error").textContent = cntError;
 				if (cntCorrect + cntError == 0) {
@@ -108,12 +196,12 @@
 				} else {
 					document.getElementById("Percent").textContent = (cntCorrect / (cntCorrect + cntError) * 100).toFixed(2);
 				}
+				
+				numberBox.classList.remove("nextNumber");
 
-				charBox.classList.remove("nextWord");
-
-				charBox.classList.add("nextWord");
+				numberBox.classList.add("nextNumber");
 				setTimeout(function() {
-					charBox.classList.remove("nextWord");
+					numberBox.classList.remove("nextNumber");
 				}, 300);
 
 			}
