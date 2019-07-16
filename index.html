@@ -76,7 +76,7 @@
 			}
 
 			.nextNumber {
-				animation: zoomIn 300ms;
+				animation: zoomIn 100ms;
 			}
 
 			@keyframes zoomIn {
@@ -132,15 +132,15 @@
 		<div id="number-box"><span id="now-number">123456.45</span></div>
 		<div id="input-box"><span id="input-span"></span><span class="blinker"></span></div>
 		<p id="count-label">
-			正确<span id="Correct">0</span>个，错误<span id="Error">0</span>个，正确率<span id="Percent">0</span>%<br>已过<span id="Second">0</span>秒
+			正确<span id="Correct">0</span>个，错误<span id="Error">0</span>个，正确率<span id="Percent">0</span>%<br><span id="SecondText">已过<span id="Second">0</span>秒</span>
 		</p>
 
 		<script type="text/javascript">
 			var c;
 			var numBox = document.getElementById("now-number");
-			var numberBox=document.getElementById("number-box");
+			var numberBox = document.getElementById("number-box");
 			var inputBox = document.getElementById("input-span");
-			
+			var gameEnd = false
 			var cntCorrect = 0;
 			var cntError = 0;
 
@@ -148,47 +148,51 @@
 			updateNum();
 
 			document.body.onkeydown = function(e) {
-				var inputNumber=e.key
-				if(!isNaN(inputNumber)||inputNumber=='.'){
-					inputBox.innerHTML = inputBox.innerText+inputNumber;
-				}else if(e.keyCode==13){
-					if(numBox.innerHTML==inputBox.innerHTML){
-						cntCorrect++;
-						numberBox.classList.add("success");
+				if (!gameEnd) {
+					var inputNumber = e.key
+					if (!isNaN(inputNumber) || inputNumber == '.') {
+						inputBox.innerHTML = inputBox.innerText + inputNumber;
+					} else if (e.keyCode == 13) {
+						if (numBox.innerHTML == inputBox.innerHTML) {
+							cntCorrect++;
+							numberBox.classList.add("success");
+							setTimeout(function() {
+								numberBox.classList.remove("success");
+							}, 100);
+						} else {
+							cntError++;
+							numberBox.classList.add("error");
+							setTimeout(function() {
+								numberBox.classList.remove("error");
+							}, 100);
+						}
+						inputBox.innerHTML = ''
 						setTimeout(function() {
-							numberBox.classList.remove("success");
-						}, 300);
-					}else{
-						cntError++;
-						numberBox.classList.add("error");
-						setTimeout(function() {
-							numberBox.classList.remove("error");
-						}, 300);
+							updateNum();
+						}, 100);
+					} else if (e.keyCode == 8) {
+						inputBox.innerHTML = inputBox.innerHTML.substring(0, inputBox.innerHTML.length - 1);
 					}
-					inputBox.innerHTML = ''
-					setTimeout(function() {
-						updateNum();
-					}, 300);
-				}else if(e.keyCode==8){
-					inputBox.innerHTML = inputBox.innerHTML.substring(0, inputBox.innerHTML.length - 1);
 				}
 			}
-			function getRand(min,max){
-				return Math.floor(Math.random()*(max-min+1)+min);
+
+			function getRand(min, max) {
+				return Math.floor(Math.random() * (max - min + 1) + min);
 			}
-			function getNumber(l){
-				var number='';
-				number+=getRand(1,9)
-				for(var i=1;i<l;i++){
-					number+=getRand(0,9)
+
+			function getNumber(l) {
+				var number = '';
+				number += getRand(1, 9)
+				for (var i = 1; i < l; i++) {
+					number += getRand(0, 9)
 				}
 				return number
 			}
-			
+
 			function updateNum() {
-				
-				numBox.textContent=getNumber(getRand(4,6))+'.'+getNumber(2)
-				
+
+				numBox.textContent = getNumber(getRand(4, 6)) + '.' + getNumber(2)
+
 				document.getElementById("Correct").textContent = cntCorrect;
 				document.getElementById("Error").textContent = cntError;
 				if (cntCorrect + cntError == 0) {
@@ -196,19 +200,26 @@
 				} else {
 					document.getElementById("Percent").textContent = (cntCorrect / (cntCorrect + cntError) * 100).toFixed(2);
 				}
-				
+
 				numberBox.classList.remove("nextNumber");
 
 				numberBox.classList.add("nextNumber");
 				setTimeout(function() {
 					numberBox.classList.remove("nextNumber");
-				}, 300);
+				}, 100);
 
 			}
 
-			setInterval(function() {
+			var interval = setInterval(function() {
 				second++;
-				document.getElementById("Second").textContent = second;
+				if (second >= 120) {
+					gameEnd = true
+					document.getElementById("SecondText").textContent = "游戏结束！";
+					clearInterval(interval);
+					alert('游戏结束，可刷新重试！')
+				}else{
+					document.getElementById("Second").textContent = second;
+				}
 			}, 1000);
 		</script>
 	</body>
