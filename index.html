@@ -170,7 +170,7 @@
 					var inputNumber = e.key
 					if (!isNaN(inputNumber) || inputNumber == '.') {
 						inputBox.innerHTML = inputBox.innerText + inputNumber;
-					} else if (e.keyCode == 13) {
+					} else if (e.keyCode == 13&&inputBox.innerHTML!='') {
 						if (numBox.innerHTML == inputBox.innerHTML) {
 							cntCorrect++;
 							numberBox.classList.add("success");
